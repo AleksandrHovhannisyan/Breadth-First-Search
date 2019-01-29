@@ -5,6 +5,14 @@
 #include <stack>
 #include <set>
 
+#ifdef _DEBUG
+#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
+// allocations to be of _CLIENT_BLOCK type
+#else
+#define DBG_NEW new
+#endif
+
 
 template<typename Type>
 struct PlannerNode
@@ -20,7 +28,7 @@ PlannerNode<Type> *BFS(Graph<Type> &graph, SearchNode<Type> *start, SearchNode<T
 {
 	std::queue<PlannerNode<Type>*> frontier;
 	std::set<SearchNode<Type>*> visited;
-	frontier.push(new PlannerNode<Type>(start));
+	frontier.push(DBG_NEW PlannerNode<Type>(start));
 
 	// Continue the search until we've exhausted all possibilities
 	while (!frontier.empty())
@@ -52,6 +60,12 @@ PlannerNode<Type> *BFS(Graph<Type> &graph, SearchNode<Type> *start, SearchNode<T
 				frontier.push(successorNode);
 			}
 		}
+	}
+
+	std::set<SearchNode<Type>*>::iterator it;
+	for (it = visited.begin(); it != visited.end(); ++it)
+	{
+		delete (*it);
 	}
 
 	return nullptr;
